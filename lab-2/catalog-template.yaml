@@ -1,0 +1,367 @@
+apiVersion: v1
+kind: Template
+metadata:
+  annotations:
+    iconClass: icon-java
+    tags: microservice,jboss
+  name: catalog
+message: |-
+  The following service(s) have been created in your project: ${APPLICATION_NAME}, ${APPLICATION_NAME}-mongodb.
+
+   JWS (Tomcat) Admin Username: ${JWS_ADMIN_USERNAME}
+   JWS (Tomcat) Admin Password: ${JWS_ADMIN_PASSWORD}
+
+   MongoDB Username:       ${CATALOG_DB_USERNAME}
+   MongoDB Password:       ${CATALOG_DB_PASSWORD}
+   MongoDB Admin Password: ${CATALOG_DB_PASSWORD}
+   MongoDB Database Name:  ${APPLICATION_NAME}db
+   MongoDB Connection URL: mongodb://${CATALOG_DB_USERNAME}:${CATALOG_DB_PASSWORD}@${APPLICATION_NAME}-mongodb/${APPLICATION_NAME}db
+objects:
+- apiVersion: v1
+  metadata:
+    labels:
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-secret
+  type: Opaque
+  stringData:
+    database-admin-password: ${CATALOG_DB_PASSWORD}
+    database-password: ${CATALOG_DB_PASSWORD}
+    database-user: ${CATALOG_DB_USERNAME}
+    tomcat-admin: ${JWS_ADMIN_USERNAME}
+    tomcat-password: ${JWS_ADMIN_PASSWORD}
+  kind: Secret
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      application: ${APPLICATION_NAME}
+  spec:
+    tags:
+    - name: latest
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      application: ${APPLICATION_NAME}
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${APPLICATION_NAME}:latest
+    source:
+      contextDir: ${GIT_CONTEXT_DIR}
+      git:
+        ref: ${GIT_REF}
+        uri: ${GIT_URI}
+      type: Git
+    strategy:
+      sourceStrategy:
+        env:
+        - name: MAVEN_MIRROR_URL
+          value: ${MAVEN_MIRROR_URL}
+        forcePull: false
+        from:
+          kind: ImageStreamTag
+          name: jboss-webserver30-tomcat8-openshift:1.2
+          namespace: openshift
+      type: Source
+    resources:
+      limits:
+        cpu: 2
+        memory: "4Gi"
+      requests:
+        cpu: "200m"
+        memory: "1Gi"
+    triggers:
+    - github:
+        secret: 5Mlic4Le
+      type: GitHub
+    - generic:
+        secret: FiArdDBH
+      type: Generic
+    - imageChange: {}
+      type: "ImageChange" 
+    - type: "ConfigChange"
+    resources:
+      limits:
+        cpu: 1
+        memory: "2Gi"
+      requests:
+        cpu: "200m"
+        memory: "512Mi"
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      application: ${APPLICATION_NAME}
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: ${APPLICATION_NAME}
+    strategy:
+      resources: {}
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          application: ${APPLICATION_NAME}
+          deploymentconfig: ${APPLICATION_NAME}
+        name: ${APPLICATION_NAME}
+      spec:
+        containers:
+        - env:
+          - name: JWS_ADMIN_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: tomcat-admin
+                name: ${APPLICATION_NAME}-secret
+          - name: JWS_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: tomcat-password
+                name: ${APPLICATION_NAME}-secret
+          - name: DB_NAME
+            value: catalogdb
+          - name: DB_SERVER
+            value: ${APPLICATION_NAME}-mongodb
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: database-user
+                name: ${APPLICATION_NAME}-secret
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: database-password
+                name: ${APPLICATION_NAME}-secret
+          image: ${APPLICATION_NAME}
+          imagePullPolicy: Always
+          name: ${APPLICATION_NAME}
+          ports:
+          - containerPort: 8778
+            name: jolokia
+            protocol: TCP
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 10
+            exec:
+              command:
+              - /bin/bash
+              - -c
+              - curl -s -u ${JWS_ADMIN_USERNAME}:${JWS_ADMIN_PASSWORD} 'http://localhost:8080/manager/jmxproxy/?get=Catalina%3Atype%3DServer&att=stateName'
+                |grep -iq 'stateName *= *STARTED'
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 1
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 75
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APPLICATION_NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${APPLICATION_NAME}:latest
+      type: ImageChange
+    - type: ConfigChange
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      service.alpha.openshift.io/dependencies: '[{"name":"${APPLICATION_NAME}-mongodb","namespace":"","kind":"Service"}]'
+    labels:
+      app: ${APPLICATION_NAME}
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      deploymentconfig: ${APPLICATION_NAME}
+- apiVersion: v1
+  kind: Route
+  metadata:
+    labels:
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}
+  spec:
+    to:
+      kind: Service
+      name: ${APPLICATION_NAME}
+      weight: 100
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-mongodb
+  spec:
+    ports:
+    - name: mongo
+      port: 27017
+      protocol: TCP
+      targetPort: 27017
+    selector:
+      deploymentconfig: ${APPLICATION_NAME}-mongodb
+    sessionAffinity: None
+    type: ClusterIP
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      application: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME}-mongodb
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: ${APPLICATION_NAME}-mongodb
+    strategy:
+      recreateParams:
+        timeoutSeconds: 600
+      resources: {}
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          application: ${APPLICATION_NAME}
+          deploymentconfig: ${APPLICATION_NAME}-mongodb
+      spec:
+        containers:
+        - env:
+          - name: KUBERNETES_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: MONGODB_USER
+            value: ${CATALOG_DB_USERNAME}
+          - name: MONGODB_PASSWORD
+            value: ${CATALOG_DB_PASSWORD}
+          - name: MONGODB_DATABASE
+            value: ${APPLICATION_NAME}db
+          - name: MONGODB_ADMIN_PASSWORD
+            value: ${CATALOG_DB_PASSWORD}
+          image: mongodb
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: 27017
+            timeoutSeconds: 1
+          name: ${APPLICATION_NAME}-mongodb
+          ports:
+          - containerPort: 27017
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -i
+              - -c
+              - mongo 127.0.0.1:27017/$MONGODB_DATABASE -u $MONGODB_USER -p $MONGODB_PASSWORD
+                --eval="quit()"
+            failureThreshold: 3
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          securityContext:
+            capabilities: {}
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /var/lib/mongodb/data
+            name: mongodb-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: mongodb-data
+          emptyDir: {}
+    test: false
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APPLICATION_NAME}-mongodb
+        from:
+          kind: ImageStreamTag
+          name: mongodb:3.2
+          namespace: openshift
+      type: ImageChange
+    - type: ConfigChange
+parameters:
+- displayName: Application name
+  name: APPLICATION_NAME
+  required: true
+  value: catalog
+- description: Git source URI for application
+  displayName: Git source repository
+  name: GIT_URI
+  required: true
+  value: https://github.com/siamaksade/catalog-service.git
+- description: Git branch/tag reference
+  displayName: Git branch/tag reference
+  name: GIT_REF
+  required: false
+  value: 
+- description: Sub-directory in the Git repo for catalog service
+  displayName: Git context dir
+  name: GIT_CONTEXT_DIR
+  required: false
+  value: 
+- description: Maven mirror url. If nexus is deployed locally, use nexus url (e.g. http://nexus.ci:8081/content/groups/public/)
+  displayName: Maven mirror url
+  name: MAVEN_MIRROR_URL
+- description: Catalog Service database user name
+  displayName: Database Username
+  from: user[a-zA-Z0-9]{3}
+  generate: expression
+  name: CATALOG_DB_USERNAME
+  required: true
+- description: Catalog Service database user password
+  displayName: Database Password
+  from: '[a-zA-Z0-9]{8}'
+  generate: expression
+  name: CATALOG_DB_PASSWORD
+  required: true
+- displayName: JWS(Tomcat) Admin User
+  from: '[a-zA-Z0-9]{8}'
+  generate: expression
+  name: JWS_ADMIN_USERNAME
+  required: true
+- displayName: JWS(Tomcat) Admin Password
+  from: '[a-zA-Z0-9]{8}'
+  generate: expression
+  name: JWS_ADMIN_PASSWORD
+  required: true
