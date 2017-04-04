@@ -11,6 +11,8 @@ spec:
     type: Git
   strategy:
     type: JenkinsPipeline
+    jenkinsPipelineStrategy:
+      jenkinsfilePath: Jenkinsfile
   triggers:
   - generic:
       secret: FiArdDBH
