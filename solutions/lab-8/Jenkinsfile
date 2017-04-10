@@ -38,8 +38,8 @@ node('maven') {
   }
 
   stage('Approve Go Live') {
-    timeout(time:10, unit:'MINUTES') {
-      input message:'Go Live in Prod (switch to new version)?'
+    timeout(time:15, unit:'MINUTES') {
+      input message:'Go Live in Prod?'
     }
   }
 
