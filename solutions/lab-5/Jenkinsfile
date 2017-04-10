@@ -28,7 +28,7 @@ node('maven') {
   }
 
   stage('End-To-End Test') {
-    sh "curl -s -X POST http://cart.prod.svc.cluster.local:8080/api/cart/testcart/444434/1"
-    sh "curl -s http://cart.prod.svc.cluster.local:8080/api/cart/testcart | grep 'Pebble Smart Watch'"
+    sh "curl -s -X POST http://cart.prod.svc.cluster.local:8080/api/cart/dummy/444434/1"
+    sh "curl -s http://cart.prod.svc.cluster.local:8080/api/cart/dummy | grep 'Pebble Smart Watch'"
   }
 }
