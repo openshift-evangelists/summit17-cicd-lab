@@ -512,6 +512,8 @@ objects:
         - env:
           - name: CATALOG_ENDPOINT
             value: http://catalog:8080
+          - name: APPLICATION_MODE
+            value: prod
           image: cart
           imagePullPolicy: Always
           livenessProbe:
@@ -610,6 +612,8 @@ objects:
         - env:
           - name: CATALOG_ENDPOINT
             value: http://catalog:8080
+          - name: APPLICATION_MODE
+            value: prod
           image: cart
           imagePullPolicy: Always
           livenessProbe:
