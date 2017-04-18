@@ -136,6 +136,19 @@ objects:
       targetPort: 8080
     selector:
       deploymentconfig: cart
+- apiVersion: v1
+  kind: Route
+  metadata:
+    labels:
+      app: cart
+      application: cart
+    name: cart
+  spec:
+    to:
+      kind: Service
+      name: cart
+      weight: 100
+    wildcardPolicy: None
 parameters:
 - displayName: Application name
   name: APPLICATION_NAME
