@@ -12,3 +12,4 @@ oc process -f https://raw.githubusercontent.com/OpenShiftDemos/nexus/master/nexu
 oc process -f $BASE_DIR/cart-template.yaml -v GIT_URI=$GIT_URI -v MAVEN_MIRROR_URL= | oc create -f - -n dev
 oc process -f $BASE_DIR/coolstore-bluegreen-template.yaml -v HOSTNAME_SUFFIX=$PROD_HOSTNAME_SUFFIX | oc create -f - -n prod
 oc process -f $BASE_DIR/pipeline-scm.yaml -v GIT_URI=$GIT_URI -v GIT_REF=jenkinsfiles | oc create -f - -n dev
+oc policy add-role-to-user edit system:serviceaccount:dev:jenkins -n prod
