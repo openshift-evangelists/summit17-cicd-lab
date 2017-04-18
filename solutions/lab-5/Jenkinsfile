@@ -24,6 +24,7 @@ node('maven') {
   }
   stage('Promote') {
     openshiftTag srcStream: 'cart', srcTag: 'latest', namespace: 'dev', destStream: 'cart', destTag: 'prod', destinationNamespace: 'prod'
+    sleep 10
     openshiftVerifyDeployment depCfg: 'cart', replicaCount: 1, verifyReplicaCount: true, namespace: 'prod'
   }
 

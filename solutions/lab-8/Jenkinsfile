@@ -29,6 +29,7 @@ node('maven') {
       altTag = "blue"
     }
     openshiftTag sourceStream: 'cart', sourceTag: 'latest', namespace: 'dev', destinationStream: 'cart', destinationTag: "prod-${tag}", destinationNamespace: 'prod'
+    sleep 10
     openshiftVerifyDeployment deploymentConfig: "cart-${tag}", replicaCount: '1', verifyReplicaCount: true, namespace: 'prod'
   }
 
