@@ -474,7 +474,7 @@ objects:
   kind: Service
   metadata:
     labels:
-      app: cart-blue
+      app: cart
       application: coolstore
       component: cart-blue
     name: cart-blue
@@ -574,7 +574,7 @@ objects:
   kind: Service
   metadata:
     labels:
-      app: cart-green
+      app: cart
       application: coolstore
       component: cart-green
     name: cart-green
