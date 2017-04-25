@@ -51,7 +51,7 @@ items:
               path: /health
               port: 8080
               scheme: HTTP
-            initialDelaySeconds: 15
+            initialDelaySeconds: 45
             periodSeconds: 5
             successThreshold: 1
             timeoutSeconds: 1
@@ -72,7 +72,7 @@ items:
               path: /health
               port: 8080
               scheme: HTTP
-            initialDelaySeconds: 15
+            initialDelaySeconds: 45
             periodSeconds: 5
             successThreshold: 1
             timeoutSeconds: 1
