@@ -7,7 +7,7 @@ metadata:
 spec:
   source:
     git:
-      uri: https://gitlab-ce-lab-infra.apps.127.0.0.1.nip.io/developer/pipelines.git
+      uri: http://gogs-lab-infra.apps.127.0.0.1.nip.io/developer/cart-service.git
     type: Git
   strategy:
     type: JenkinsPipeline
