@@ -45,6 +45,7 @@ node('maven') {
   }
 
   stage('Go Live') {
+    sh "oc project prod"
     sh "oc set route-backends cart cart-${tag}=100 cart-${altTag}=0 -n prod"
   }
 }
