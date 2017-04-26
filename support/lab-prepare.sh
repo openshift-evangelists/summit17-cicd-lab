@@ -119,7 +119,7 @@ function build_images() {
   oc tag openshift/catalog:latest openshift/coolstore-catalog:prod --as=system:admin
   oc tag openshift/coolstore-gw:latest openshift/coolstore-gateway:prod --as=system:admin
 
-  oc create -f https://raw.githubusercontent.com/openshift-evangelists/summit17-cicd-lab/master/solutions/lab-5/coolstore-template.yaml -n openshift --as=system:admin
+  oc create -f https://raw.githubusercontent.com/openshift-evangelists/summit17-cicd-lab/master/lab-5/coolstore-template.yaml -n openshift --as=system:admin
 }
 
 ########################
