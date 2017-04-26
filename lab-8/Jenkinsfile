@@ -22,6 +22,7 @@ node('maven') {
   def altTag="green"
   
   stage('Promote') {
+    sh "oc project prod"
     sh "oc get route cart -n prod -o jsonpath='{ .spec.to.name }' > activeservice"
     activeService = readFile('activeservice').trim()
     if (activeService == "cart-blue") {
@@ -31,6 +32,7 @@ node('maven') {
     openshiftTag sourceStream: 'cart', sourceTag: 'latest', namespace: 'dev', destinationStream: 'cart', destinationTag: "prod-${tag}", destinationNamespace: 'prod'
     sleep 10
     openshiftVerifyDeployment deploymentConfig: "cart-${tag}", replicaCount: '1', verifyReplicaCount: true, namespace: 'prod'
+    sleep 5
   }
 
   stage('End-To-End Test') {
