@@ -124,7 +124,7 @@ function build_images() {
 
 function make_infra_readonly() {
   oc policy remove-role-from-user admin developer -n lab-infra --as=system:admin
-  oc policy add-role-to-user view developer -n lab-infra --as=system:admin
+  #oc policy add-role-to-user view developer -n lab-infra --as=system:admin
 }
 ########################
 # Prepare Labs Cluster #
@@ -134,9 +134,9 @@ START=`date +%s`
 create_project
 deploy_nexus
 deploy_gogs
-make_infra_readonly
 import_imagestreams
 build_images
+make_infra_readonly
 
 END=`date +%s`
 echo
