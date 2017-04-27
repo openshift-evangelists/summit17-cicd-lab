@@ -122,6 +122,10 @@ function build_images() {
   oc create -f https://raw.githubusercontent.com/openshift-evangelists/summit17-cicd-lab/master/lab-5/coolstore-template.yaml -n openshift --as=system:admin
 }
 
+function make_infra_readonly() {
+  oc policy remove-role-from-user admin developer -n lab-infra --as=system:admin
+  oc policy add-role-to-user view developer -n lab-infra --as=system:admin
+}
 ########################
 # Prepare Labs Cluster #
 ########################
@@ -130,6 +134,7 @@ START=`date +%s`
 create_project
 deploy_nexus
 deploy_gogs
+make_infra_readonly
 import_imagestreams
 build_images
 
