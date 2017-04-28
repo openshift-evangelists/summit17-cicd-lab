@@ -415,7 +415,7 @@ objects:
               - /bin/sh
               - -i
               - -c
-              - mongo 127.0.0.1:27017/$MONGODB_DATABASE -u $MONGODB_USER -p $MONGODB_PASSWORD
+              - mongo 192.168.122.10:27017/$MONGODB_DATABASE -u $MONGODB_USER -p $MONGODB_PASSWORD
                 --eval="quit()"
             failureThreshold: 3
             initialDelaySeconds: 3
@@ -874,7 +874,7 @@ objects:
               - /bin/sh
               - -i
               - -c
-              - psql -h 127.0.0.1 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c 'SELECT 1'
+              - psql -h 192.168.122.10 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c 'SELECT 1'
             initialDelaySeconds: 5
             timeoutSeconds: 1
           resources:
@@ -939,7 +939,7 @@ parameters:
   displayName: Hostname Suffix
   name: HOSTNAME_SUFFIX
   required: true
-  value: prod.apps.127.0.0.1.nip.io
+  value: prod.apps.192.168.122.10.nip.io
 - description: Catalog Service database user name
   displayName: Catalog Database Username
   from: user[a-zA-Z0-9]{3}
