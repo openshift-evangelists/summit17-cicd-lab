@@ -29,7 +29,7 @@ function wait_while_empty() {
 
 # Deploy Nexus
 function deploy_nexus() {
-  oc process -f https://raw.githubusercontent.com/OpenShiftDemos/nexus/master/nexus2-template.yaml | oc create -f - -n lab-infra
+  oc process -f https://raw.githubusercontent.com/OpenShiftDemos/nexus/master/nexus2-persistent-template.yaml | oc create -f - -n lab-infra
   oc set resources dc/nexus --limits=cpu=1,memory=2Gi --requests=cpu=200m,memory=1Gi -n lab-infra
 }
 
