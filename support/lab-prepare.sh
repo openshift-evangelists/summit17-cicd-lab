@@ -119,10 +119,10 @@ function build_images() {
   oc tag openshift/catalog:latest openshift/coolstore-catalog:prod --as=system:admin
   oc tag openshift/coolstore-gw:latest openshift/coolstore-gateway:prod --as=system:admin
 
-  oc create -f https://raw.githubusercontent.com/openshift-evangelists/summit17-cicd-lab/master/lab-5/coolstore-template.yaml -n openshift --as=system:admin
+  oc create -f https://raw.githubusercontent.com/openshift-evangelists/summit17-cicd-lab/master/lab-6/coolstore-template.yaml -n openshift --as=system:admin
 }
 
-function make_infra_readonly() {
+function set_project_permissions() {
   oc policy remove-role-from-user admin developer -n lab-infra --as=system:admin
   # oc policy add-role-to-user view developer -n lab-infra --as=system:admin
 }
@@ -136,7 +136,7 @@ deploy_nexus
 deploy_gogs
 import_imagestreams
 build_images
-make_infra_readonly
+set_project_permissions
 
 END=`date +%s`
 echo

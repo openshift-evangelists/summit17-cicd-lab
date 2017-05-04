@@ -9,7 +9,7 @@ oc new-project dev --display-name="Cart Dev"
 oc new-project prod --display-name="Coolstore Prod"
 
 # Deploy Dev
-oc process -f https://raw.githubusercontent.com/openshift-evangelists/summit17-cicd-lab/master/lab-2/cart-template.yaml \
+oc process -f https://raw.githubusercontent.com/openshift-evangelists/summit17-cicd-lab/master/lab-3/cart-template.yaml \
     --param=GIT_URI=$CART_REPO \
     --param=MAVEN_MIRROR_URL=http://nexus.lab-infra.svc.cluster.local:8081/content/groups/public/ \
     | oc create -f - -n dev

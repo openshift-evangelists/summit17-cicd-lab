@@ -1,6 +1,6 @@
 node('maven') {
   stage('Build App') {
-    git url: "http://gogs-lab-infra.apps.192.168.122.10.nip.io/developer/cart-service.git"
+    git url: "http://gogs.lab-infra.svc.cluster.local:3000/developer/cart-service.git"
     sh "mvn clean package -s src/main/config/settings.xml"
   }
   stage('Integration Test') {
