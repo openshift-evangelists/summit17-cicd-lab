@@ -41,8 +41,8 @@ objects:
       spec:
         containers:
         - env:
-          - name: COOLSTORE_GW_ENDPOINT
-            value: http://gw-${HOSTNAME_SUFFIX}
+          - name: COOLSTORE_GW_SERVICE
+            value: coolstore-gw
           - name: HOSTNAME_HTTP
             value: web-ui:8080
           image: web-ui
