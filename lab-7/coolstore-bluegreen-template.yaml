@@ -939,7 +939,7 @@ parameters:
   displayName: Hostname Suffix
   name: HOSTNAME_SUFFIX
   required: true
-  value: prod.apps.192.168.122.10.nip.io
+  value: prod.apps.192.168.99.100.nip.io
 - description: Catalog Service database user name
   displayName: Catalog Database Username
   from: user[a-zA-Z0-9]{3}

@@ -415,7 +415,7 @@ objects:
               - /bin/sh
               - -i
               - -c
-              - mongo 192.168.122.10:27017/$MONGODB_DATABASE -u $MONGODB_USER -p $MONGODB_PASSWORD
+              - mongo 127.0.0.1:27017/$MONGODB_DATABASE -u $MONGODB_USER -p $MONGODB_PASSWORD
                 --eval="quit()"
             failureThreshold: 3
             initialDelaySeconds: 3
@@ -766,7 +766,7 @@ objects:
               - /bin/sh
               - -i
               - -c
-              - psql -h 192.168.122.10 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c 'SELECT 1'
+              - psql -h 127.0.0.1 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c 'SELECT 1'
             initialDelaySeconds: 5
             timeoutSeconds: 1
           resources:

@@ -158,7 +158,7 @@ parameters:
   displayName: Git source repository
   name: GIT_URI
   required: true
-  value: http://gogs-lab-infra.apps.192.168.122.10.nip.io/developer/cart-service.git
+  value: http://gogs-lab-infra.apps.192.168.99.100.nip.io/developer/cart-service.git
 - description: Git branch/tag reference
   displayName: Git branch/tag reference
   name: GIT_REF
