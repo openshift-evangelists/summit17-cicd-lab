@@ -124,7 +124,7 @@ function build_images() {
 
 function set_project_permissions() {
   oc policy remove-role-from-user admin developer -n lab-infra --as=system:admin
-  # oc policy add-role-to-user view developer -n lab-infra --as=system:admin
+  oc policy add-role-to-user view developer -n lab-infra --as=system:admin
 }
 ########################
 # Prepare Labs Cluster #
@@ -134,6 +134,7 @@ START=`date +%s`
 create_project
 deploy_nexus
 deploy_gogs
+sleep 5
 import_imagestreams
 build_images
 set_project_permissions
